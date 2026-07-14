@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0d1117"/>
+  <rect x="60" y="220" width="80" height="80" rx="18" fill="#161b22" stroke="#30363d"/>
+  <text x="170" y="282" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="700" fill="#e6edf3">DevPilot AI</text>
+  <text x="60" y="400" font-family="Inter, Arial, sans-serif" font-size="40" fill="#9da7b3">Repository Mentor</text>
+  <text x="60" y="460" font-family="Inter, Arial, sans-serif" font-size="28" fill="#7c6cff">Turn any GitHub repo into a guided conversation.</text>
+</svg>

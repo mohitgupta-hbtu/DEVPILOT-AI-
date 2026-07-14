@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Node
+node_modules/
+dist/
+*.local
+
+# Editor / OS
+.vscode/
+.DS_Store
+*.log
+
+# Build outputs
+.output/
+
+# Databases
+backend/*.db
+backend/*.sqlite3
+backend/*.db-journal

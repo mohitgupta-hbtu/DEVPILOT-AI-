@@ -1,0 +1,42 @@
+# Self-host option. The app normally uses Supabase Postgres; this compose
+# bundle is for local/self-hosted runs with a bundled Postgres.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: devpilot
+      POSTGRES_PASSWORD: devpilot
+      POSTGRES_DB: devpilot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devpilot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://devpilot:devpilot@db:5432/devpilot
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_REDIRECT_URI: ${GITHUB_REDIRECT_URI:-http://localhost:5173/auth/callback}
+      JWT_SECRET: ${JWT_SECRET:-change_me_to_a_long_random_secret}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      AI_PROVIDER: ${AI_PROVIDER:-gemini}
+      PORT: 8000
+    restart: unless-stopped
+
+volumes:
+  pgdata:

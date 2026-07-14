@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* DevPilot AI — workspace design tokens (GitHub + Linear inspired, dark-first) */
+@theme inline {
+  --color-canvas: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-2: #1c2230;
+  --color-elevated: #21262d;
+  --color-line: #30363d;
+  --color-line-soft: #21262d;
+  --color-ink: #e6edf3;
+  --color-ink-soft: #9da7b3;
+  --color-ink-faint: #6e7681;
+  --color-accent: #7c6cff;
+  --color-accent-soft: #2a2350;
+  --color-success: #3fb950;
+  --color-danger: #f85149;
+  --color-warning: #d29922;
+  --radius-card: 14px;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Light theme override (user-settable) */
+[data-theme="light"] {
+  --color-canvas: #f6f8fa;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0f3f6;
+  --color-elevated: #eaeef2;
+  --color-line: #d8dee4;
+  --color-line-soft: #eaeef2;
+  --color-ink: #1f2328;
+  --color-ink-soft: #57606a;
+  --color-ink-faint: #8c959f;
+  --color-accent-soft: #ece9ff;
+  color-scheme: light;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 8px;
+}
+
+/* Accessibility: visible focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Screen-reader-only utility (used by the skip link) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* PDF / print export for the Repository Mentor conversation */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  aside,
+  form,
+  header button,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+  .flex.min-h-0.flex-1,
+  main {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .overflow-y-auto {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+  section,
+  div {
+    box-shadow: none !important;
+  }
+  * {
+    border-color: #ddd !important;
+  }
+  .text-ink,
+  .text-ink-soft,
+  .text-ink-faint {
+    color: #111 !important;
+  }
+  .bg-surface,
+  .bg-canvas,
+  .bg-elevated,
+  .bg-accent-soft,
+  .bg-accent {
+    background: #fff !important;
+  }
+  .text-accent {
+    color: #5b4bd6 !important;
+  }
+  pre,
+  code {
+    background: #f4f4f4 !important;
+    color: #111 !important;
+  }
+}

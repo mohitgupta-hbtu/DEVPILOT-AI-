@@ -1,0 +1,34 @@
+# Render deployment
+# Backend = Docker web service. Frontend = static site (build with Vite).
+# Frontend is ideally deployed on Vercel; this file covers the API on Render.
+
+services:
+  - type: web
+    name: devpilot-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: starter
+    healthCheckPath: /health
+    env:
+      - key: DATABASE_URL
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_REDIRECT_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+      - key: FRONTEND_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: AI_PROVIDER
+        value: gemini
+      - key: PORT
+        value: 8000
