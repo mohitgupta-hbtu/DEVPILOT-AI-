@@ -60,9 +60,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Ignored: parsing failure on initial load
     }
 
+    const BACKEND_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(
+      /\/+$/,
+      "",
+    );
+
     // 3. Keep in sync with /me API check
-    fetch("http://localhost:8000/me", { credentials: "include" })
-      .then(async (res) => {
+    const checkUser = async () => {
+      try {
+        let res = await fetch(`${BACKEND_URL}/me`, { credentials: "include" });
+
+        // If expired access token (401), try silently refreshing
+        if (res.status === 401) {
+          const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh`, {
+            method: "POST",
+            credentials: "include",
+          });
+          if (refreshRes.ok) {
+            // Retry /me after successful refresh
+            res = await fetch(`${BACKEND_URL}/me`, { credentials: "include" });
+          }
+        }
+
         if (res.ok) {
           const data = await res.json();
           setUser(data);
@@ -71,21 +90,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(null);
           localStorage.removeItem("devpilot_user");
         }
-      })
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
+      } catch (error) {
+        // Network error, keep whatever is in local storage (fallback user)
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkUser();
   }, []);
 
   const loginWithGitHub = () => {
     // Navigate the browser directly to the backend OAuth endpoint.
     // This ensures the state cookie is set on the backend domain (same-origin)
     // and the redirect chain works: Backend → GitHub → Backend callback → Frontend
-    window.location.href = "http://localhost:8000/auth/github/login";
+    const BACKEND_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(
+      /\/+$/,
+      "",
+    );
+    window.location.href = `${BACKEND_URL}/auth/github/login`;
   };
 
   const logout = async () => {
+    const BACKEND_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(
+      /\/+$/,
+      "",
+    );
     try {
-      await fetch("http://localhost:8000/logout", { method: "POST", credentials: "include" });
+      await fetch(`${BACKEND_URL}/logout`, { method: "POST", credentials: "include" });
     } catch (e) {
       // Ignored: network failure during logout redirect
     }

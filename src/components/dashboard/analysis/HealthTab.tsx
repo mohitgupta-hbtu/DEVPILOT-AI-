@@ -17,6 +17,7 @@ export function HealthTab() {
         repoName={activeResult.name}
         overallHealthScore={activeResult.healthScore}
         onNavigateToFile={onNavigateToFile}
+        repoLanguages={activeResult.languages}
       />
     </div>
   );

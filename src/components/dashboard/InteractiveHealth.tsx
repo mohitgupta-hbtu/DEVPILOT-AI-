@@ -14,7 +14,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { HealthMetrics, HealthRecommendation, HealthExpl } from "@/types";
+import { HealthMetrics, HealthRecommendation, HealthExpl, LanguageDistribution } from "@/types";
 
 interface InteractiveHealthProps {
   metrics: HealthMetrics;
@@ -24,6 +24,7 @@ interface InteractiveHealthProps {
   repoName: string;
   overallHealthScore?: number;
   onNavigateToFile?: (filePath: string) => void;
+  repoLanguages?: LanguageDistribution[];
 }
 
 export function InteractiveHealth({
@@ -34,6 +35,7 @@ export function InteractiveHealth({
   repoName,
   overallHealthScore,
   onNavigateToFile,
+  repoLanguages,
 }: InteractiveHealthProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>("documentation");
   const [expandedRecId, setExpandedRecId] = useState<string | null>(null);
@@ -47,6 +49,17 @@ export function InteractiveHealth({
     const list: HealthRecommendation[] = [];
     if (!metrics) return list;
 
+    const dominantLang =
+      repoLanguages && repoLanguages.length > 0
+        ? repoLanguages.reduce(
+            (max, lang) => (lang.percentage > max.percentage ? lang : max),
+            repoLanguages[0],
+          ).name
+        : "javascript";
+
+    const isPython =
+      dominantLang.toLowerCase() === "python" || dominantLang.toLowerCase() === "jupyter notebook";
+
     if (metrics.documentation <= 85) {
       list.push({
         id: "fall-readme",
@@ -55,8 +68,9 @@ export function InteractiveHealth({
         description:
           "The documentation score is low. Consider publishing a detailed README layout explaining dependencies, build parameters, and local .env keys.",
         severity: "medium",
-        suggestion:
-          "# Setup Instructions\n1. Copy environment keys:\n   cp .env.example .env\n2. Boot standard scripts:\n   npm install && npm run dev",
+        suggestion: isPython
+          ? "# Setup Instructions\n1. Copy environment keys:\n   cp .env.example .env\n2. Boot virtual environment:\n   python -m venv venv && source venv/bin/activate\n   pip install -r requirements.txt"
+          : "# Setup Instructions\n1. Copy environment keys:\n   cp .env.example .env\n2. Boot standard scripts:\n   npm install && npm run dev",
       });
     }
 
@@ -64,12 +78,16 @@ export function InteractiveHealth({
       list.push({
         id: "fall-eslint",
         category: "quality",
-        title: "Integrate Quality Checks (ESLint / Prettier)",
-        description:
-          "Code syntax metrics are sub-optimal. Integrate ESLint and prettier configurations to enforce standard rulesets dynamically across team updates.",
+        title: isPython
+          ? "Integrate Quality Checks (Flake8 / Black)"
+          : "Integrate Quality Checks (ESLint / Prettier)",
+        description: isPython
+          ? "Code syntax metrics are sub-optimal. Integrate Flake8, Black, or Ruff configurations to enforce standard rulesets dynamically across team updates."
+          : "Code syntax metrics are sub-optimal. Integrate ESLint and prettier configurations to enforce standard rulesets dynamically across team updates.",
         severity: "medium",
-        suggestion:
-          "npm init @eslint/config\n# And generate .prettierrc files:\necho {} > .prettierrc",
+        suggestion: isPython
+          ? "pip install black flake8 ruff\n# And generate configs:\necho '[tool.black]\nline-length = 88' > pyproject.toml"
+          : "npm init @eslint/config\n# And generate .prettierrc files:\necho {} > .prettierrc",
       });
     }
 
@@ -78,11 +96,13 @@ export function InteractiveHealth({
         id: "fall-testing",
         category: "testing",
         title: "Establish Automated Testing Framework",
-        description:
-          "No codebase testing suites were parsed during this scan. Set up Vitest or Pytest to assert operational stability before publishing compiler modifications.",
+        description: isPython
+          ? "No codebase testing suites were parsed during this scan. Set up pytest to assert operational stability before publishing modifications."
+          : "No codebase testing suites were parsed during this scan. Set up Vitest or Jest to assert operational stability before publishing modifications.",
         severity: "high",
-        suggestion:
-          "# Install testing runners:\nnpm install -D vitest\n# run unit checks:\nnpx vitest",
+        suggestion: isPython
+          ? "# Install testing runners:\npip install pytest pytest-cov\n# run unit checks:\npytest"
+          : "# Install testing runners:\nnpm install -D vitest\n# run unit checks:\nnpx vitest",
       });
     }
 
@@ -91,15 +111,18 @@ export function InteractiveHealth({
         id: "fall-folders",
         category: "maintainability",
         title: "Partition Files Into Dedicated Subfolders",
-        description:
-          "Flat or disorganized source files hamper project navigation. Consider allocating code into dedicated structures like `/src/components` and `/src/utils`.",
+        description: isPython
+          ? "Flat or disorganized source files hamper project navigation. Consider allocating code into dedicated structures like `/api`, `/core`, `/services` and `/models`."
+          : "Flat or disorganized source files hamper project navigation. Consider allocating code into dedicated structures like `/src/components` and `/src/utils`.",
         severity: "low",
-        suggestion: "mkdir src/components src/utils src/hooks src/services",
+        suggestion: isPython
+          ? "mkdir -p app/api app/core app/services app/models"
+          : "mkdir src/components src/utils src/hooks src/services",
       });
     }
 
     return list;
-  }, [recommendations, metrics]);
+  }, [recommendations, metrics, repoLanguages]);
 
   // Overall combined score is the average of the metrics
   const overallScore = useMemo(() => {

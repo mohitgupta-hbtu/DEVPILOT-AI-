@@ -103,10 +103,14 @@ export function Sidebar({ onCloseMobile, className = "" }: SidebarProps) {
         </div>
         {SECONDARY_ITEMS.map((item) => {
           const Icon = item.icon;
+          const href =
+            item.label === "API Reference"
+              ? `${(import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/+$/, "")}/docs`
+              : item.href;
           return (
             <a
               key={item.label}
-              href={item.href}
+              href={href}
               target="_blank"
               rel="noreferrer"
               onClick={handleLinkClick}

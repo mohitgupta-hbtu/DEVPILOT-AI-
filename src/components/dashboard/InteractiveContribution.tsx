@@ -1,37 +1,100 @@
 import React, { useState } from "react";
 import { BookOpen, Terminal, Info, Check, Tag, ExternalLink } from "lucide-react";
-import { GoodFirstIssue } from "@/types";
+import { GoodFirstIssue, LanguageDistribution } from "@/types";
 
 interface InteractiveContributionProps {
   issues: GoodFirstIssue[];
   repoUrl: string;
   repoName: string;
   onNavigateToFile?: (filePath: string) => void;
+  repoLanguages?: LanguageDistribution[];
 }
 
-const SETUP_COMMANDS = [
-  {
-    step: "1. Clone & Branch",
-    desc: "Clone the main branch and spin up a feature branch naming it clearly based on task specs.",
-    cmd: "git clone <repo_url>\ngit checkout -b feat/your-feature-name",
-  },
-  {
-    step: "2. Install & Start",
-    desc: "Pull in the base configuration packages and launch the local sandbox server.",
-    cmd: "npm install\nnpm run dev",
-  },
-  {
-    step: "3. Format & Test",
-    desc: "Run style rules and verify that none of the core unit specs break prior to commit.",
-    cmd: "npm run lint\nnpm run test",
-  },
-];
+const getSetupCommands = (dominantLang: string) => {
+  const lang = dominantLang.toLowerCase();
+
+  if (lang === "python" || lang === "jupyter notebook") {
+    return [
+      {
+        step: "1. Clone & Branch",
+        desc: "Clone the main branch and spin up a feature branch naming it clearly based on task specs.",
+        cmd: "git clone <repo_url>\ngit checkout -b feat/your-feature-name",
+      },
+      {
+        step: "2. Install & Start",
+        desc: "Pull in the base configuration packages and launch the local sandbox server.",
+        cmd: "python -m venv venv\nsource venv/bin/activate\npip install -r requirements.txt",
+      },
+      {
+        step: "3. Format & Test",
+        desc: "Run style rules and verify that none of the core unit specs break prior to commit.",
+        cmd: "pytest\nflake8 .",
+      },
+    ];
+  }
+
+  if (lang === "c++" || lang === "c" || lang === "cmake") {
+    return [
+      {
+        step: "1. Clone & Branch",
+        desc: "Clone the repository recursively to ensure all submodules are available.",
+        cmd: "git clone --recursive <repo_url>\ngit checkout -b feat/your-feature-name",
+      },
+      {
+        step: "2. Configure & Build",
+        desc: "Generate build files using CMake and compile the repository targets.",
+        cmd: "mkdir build && cd build\ncmake ..\ncmake --build .",
+      },
+      {
+        step: "3. Test Execution",
+        desc: "Run the output binaries or CTest scripts to verify module stability.",
+        cmd: "ctest --output-on-failure",
+      },
+    ];
+  }
+
+  if (lang === "go") {
+    return [
+      { step: "1. Clone", desc: "Clone the repo.", cmd: "git clone <repo_url>" },
+      { step: "2. Install", desc: "Download go modules.", cmd: "go mod download\ngo mod tidy" },
+      { step: "3. Test", desc: "Run go tests.", cmd: "go test ./..." },
+    ];
+  }
+
+  if (lang === "rust") {
+    return [
+      { step: "1. Clone", desc: "Clone the repo.", cmd: "git clone <repo_url>" },
+      { step: "2. Build", desc: "Build via Cargo.", cmd: "cargo build" },
+      { step: "3. Test", desc: "Run strict tests.", cmd: "cargo test\ncargo clippy" },
+    ];
+  }
+
+  // Default to Node/JS/TS
+  return [
+    {
+      step: "1. Clone & Branch",
+      desc: "Clone the main branch and spin up a feature branch naming it clearly based on task specs.",
+      cmd: "git clone <repo_url>\ngit checkout -b feat/your-feature-name",
+    },
+    {
+      step: "2. Install & Start",
+      desc: "Pull in the base configuration packages and launch the local sandbox server.",
+      cmd: "npm install\nnpm run dev",
+    },
+    {
+      step: "3. Format & Test",
+      desc: "Run style rules and verify that none of the core unit specs break prior to commit.",
+      cmd: "npm run lint\nnpm run test",
+    },
+  ];
+};
 
 export function InteractiveContribution({
   issues,
   repoUrl,
   repoName,
   onNavigateToFile,
+  repoLanguages,
 }: InteractiveContributionProps) {
   const [activeIssueId, setActiveIssueId] = useState<string | null>(issues[0]?.id || null);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
@@ -43,6 +106,18 @@ export function InteractiveContribution({
   };
 
   const activeIssue = issues.find((i) => i.id === activeIssueId) || issues[0];
+  const dominantLang =
+    repoLanguages && repoLanguages.length > 0
+      ? repoLanguages.reduce(
+          (max, lang) => (lang.percentage > max.percentage ? lang : max),
+          repoLanguages[0],
+        ).name
+      : "javascript";
+
+  const isPython =
+    dominantLang.toLowerCase() === "python" || dominantLang.toLowerCase() === "jupyter notebook";
+
+  const setupCommands = getSetupCommands(dominantLang);
 
   return (
     <div className="space-y-6">
@@ -96,7 +171,7 @@ export function InteractiveContribution({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-          {SETUP_COMMANDS.map((step, idx) => (
+          {setupCommands.map((step, idx) => (
             <div
               key={idx}
               className="rounded-xl border border-border/60 bg-background/30 p-4 flex flex-col justify-between space-y-3"
@@ -231,13 +306,13 @@ export function InteractiveContribution({
                     {onNavigateToFile && (
                       <span
                         className="rounded bg-background border border-border px-2 py-1 text-[10px] font-mono text-primary cursor-pointer hover:border-primary/80 transition-colors shadow-sm"
-                        onClick={() => onNavigateToFile("src/App.tsx")}
+                        onClick={() => onNavigateToFile(isPython ? "main.py" : "src/App.tsx")}
                       >
-                        src/App.tsx
+                        {isPython ? "main.py" : "src/App.tsx"}
                       </span>
                     )}
                     <span className="rounded bg-background border border-border px-2 py-1 text-[10px] font-mono text-muted-foreground cursor-not-allowed">
-                      package.json
+                      {isPython ? "requirements.txt" : "package.json"}
                     </span>
                   </div>
                 </div>

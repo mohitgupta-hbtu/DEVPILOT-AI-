@@ -109,11 +109,6 @@ export function LoadingState() {
           <div ref={terminalEndRef} />
         </div>
       </motion.div>
-
-      {/* Structural layout skeleton preview below terminal to wow the user */}
-      <div className="opacity-45 pointer-events-none mt-8 border-t border-border/20 pt-8">
-        <OverviewLoadingSkeleton />
-      </div>
     </div>
   );
 }

@@ -1,17 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Code, Layers, Folder, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardCard } from "@/components/ui/DashboardCard";
+import { useRepository } from "./RepositoryContext";
 
 interface InfoDetails {
+  id: string;
+  label: string;
   title: string;
   desc: string;
   files: string[];
   tips: string[];
+  defaultLabel: string;
 }
 
-const ARCHITECTURE_INFOMAP: Record<string, InfoDetails> = {
+const REACT_INFOMAP: Record<string, InfoDetails> = {
   entry: {
+    id: "entry",
+    label: "Main Node Entry",
+    defaultLabel: "src/main.tsx",
     title: "System Entrypoint Node",
     desc: "The runtime root of the application. It bootstraps global styles, registers environment providers, and mounts the primary React render tree safely.",
     files: ["src/main.tsx", "index.html", "src/styles.css"],
@@ -21,6 +28,9 @@ const ARCHITECTURE_INFOMAP: Record<string, InfoDetails> = {
     ],
   },
   routing: {
+    id: "routing",
+    label: "App Routing",
+    defaultLabel: "src/router.tsx",
     title: "Application Router",
     desc: "Defines client-side URL path navigation structures, loader states, parameters, and security authentication filters.",
     files: ["src/router.tsx", "src/routes/"],
@@ -30,6 +40,9 @@ const ARCHITECTURE_INFOMAP: Record<string, InfoDetails> = {
     ],
   },
   layout: {
+    id: "layout",
+    label: "Layout Shell",
+    defaultLabel: "src/routes/__root",
     title: "Visual Layout Shell",
     desc: "Persistent parent shell layout mapping core navigational frames, sidebars, context notifications, and user metadata banners.",
     files: ["src/routes/__root.tsx", "src/components/layout/"],
@@ -39,8 +52,11 @@ const ARCHITECTURE_INFOMAP: Record<string, InfoDetails> = {
     ],
   },
   components: {
+    id: "components",
+    label: "Components",
+    defaultLabel: "Components",
     title: "Reusable UI Components",
-    desc: "Atomic and pattern components styled using Tailwind. Ensures layout consistency across pages.",
+    desc: "Atomic and pattern components. Ensures layout consistency across pages.",
     files: ["src/components/ui/", "src/components/dashboard/"],
     tips: [
       "Keep UI components stateless by delegating updates back up via clear callback events.",
@@ -48,6 +64,9 @@ const ARCHITECTURE_INFOMAP: Record<string, InfoDetails> = {
     ],
   },
   hooks: {
+    id: "hooks",
+    label: "Custom Hooks",
+    defaultLabel: "Custom Hooks",
     title: "Custom State Hooks",
     desc: "Encapsulates reusable reactive behaviors, side-effects, cache timers, and backend API query wrappers.",
     files: ["src/hooks/", "src/contexts/"],
@@ -57,6 +76,9 @@ const ARCHITECTURE_INFOMAP: Record<string, InfoDetails> = {
     ],
   },
   lib: {
+    id: "lib",
+    label: "Lib / Utils",
+    defaultLabel: "Lib / Utils",
     title: "Core Service Utilities",
     desc: "Low-level API wrappers, database connections, formatting helpers, and complex computational algorithms.",
     files: ["src/lib/", "src/utils/", "src/services/"],
@@ -67,9 +89,98 @@ const ARCHITECTURE_INFOMAP: Record<string, InfoDetails> = {
   },
 };
 
+const PYTHON_INFOMAP: Record<string, InfoDetails> = {
+  entry: {
+    id: "entry",
+    label: "Main Script / App",
+    defaultLabel: "main.py / app.py",
+    title: "System Entrypoint Node",
+    desc: "The primary runtime execution script for the Python application, typically bootstrapping the server, CLI command, or data pipeline.",
+    files: ["main.py", "app.py", "wsgi.py", "run.py"],
+    tips: [
+      "Keep global scope clean to prevent memory leaks in worker processes.",
+      "Ensure environment variables are loaded securely at initialization.",
+    ],
+  },
+  routing: {
+    id: "routing",
+    label: "API Routing",
+    defaultLabel: "routes / api",
+    title: "Application API / Routing",
+    desc: "Defines network endpoints, URL routing configurations, or controller setups.",
+    files: ["routes.py", "urls.py", "api/"],
+    tips: [
+      "Group related endpoints under distinct router modules.",
+      "Keep endpoint handlers thin by deferring to service layers.",
+    ],
+  },
+  layout: {
+    id: "layout",
+    label: "Data Models",
+    defaultLabel: "models / schemas",
+    title: "Domain Data Models",
+    desc: "Core data validation and ORM bridging layers governing data persistence and application state shapes.",
+    files: ["models.py", "schemas.py", "db/"],
+    tips: [
+      "Avoid putting complex business logic inside raw database models.",
+      "Use robust validation libraries like Pydantic or Marshmallow.",
+    ],
+  },
+  components: {
+    id: "components",
+    label: "Business Logic",
+    defaultLabel: "Controllers / Services",
+    title: "Core Services",
+    desc: "Isolated functional modules where domain-specific logic resides away from network requests.",
+    files: ["services/", "controllers/", "core/"],
+    tips: [
+      "Keep services independent from the web framework mechanics.",
+      "Write clear unit tests mocking the database repositories.",
+    ],
+  },
+  hooks: {
+    id: "hooks",
+    label: "Middleware",
+    defaultLabel: "Middleware / Config",
+    title: "Middleware & Config",
+    desc: "Request interceptors, authentication guards, security policies, and environment setup configurations.",
+    files: ["middleware.py", "config.py", "settings.py"],
+    tips: [
+      "Apply rate-limiting and CORS systematically via middleware.",
+      "Load secrets strictly through environment adapters.",
+    ],
+  },
+  lib: {
+    id: "lib",
+    label: "Utils / Helpers",
+    defaultLabel: "Utils",
+    title: "Core Service Utilities",
+    desc: "Low-level API wrappers, database connections, formatting helpers, and complex computational algorithms.",
+    files: ["utils/", "lib/", "helpers/"],
+    tips: [
+      "Write purely deterministic helpers that can be unit-tested without complex mock states.",
+      "Ensure thread-safety across globally accessible utilities.",
+    ],
+  },
+};
+
 export function ArchitectureTab() {
+  const { activeResult } = useRepository();
   const [activeNode, setActiveNode] = useState<string>("entry");
-  const activeInfo = ARCHITECTURE_INFOMAP[activeNode] || ARCHITECTURE_INFOMAP.entry;
+
+  const infomap = useMemo(() => {
+    if (!activeResult) return REACT_INFOMAP;
+    const isPython = activeResult.languages?.some(
+      (l) => l.name.toLowerCase() === "python" && l.percentage > 35,
+    );
+    const isNotebook = activeResult.languages?.some(
+      (l) => l.name.toLowerCase() === "jupyter notebook" && l.percentage > 50,
+    );
+    if (isPython || isNotebook) return PYTHON_INFOMAP;
+    return REACT_INFOMAP;
+  }, [activeResult]);
+
+  const activeInfo = infomap[activeNode] || infomap.entry;
 
   return (
     <motion.div
@@ -102,14 +213,14 @@ export function ArchitectureTab() {
                   ? "border-primary bg-primary/10 shadow-[0_0_20px_-3px_rgba(var(--ring),0.25)] ring-1 ring-primary"
                   : "border-border/60 bg-card hover:border-primary/40 hover:bg-muted/30"
               }`}
-              aria-label="System Entrypoint module details"
+              aria-label={`${infomap.entry.label} node details`}
             >
               <Code
                 className={`h-5 w-5 mx-auto mb-2 ${activeNode === "entry" ? "text-primary" : "text-muted-foreground"}`}
               />
-              <span className="block text-xs font-bold font-mono">Main Node Entry</span>
+              <span className="block text-xs font-bold font-mono">{infomap.entry.label}</span>
               <span className="block text-[9px] text-muted-foreground font-mono mt-1">
-                src/main.tsx
+                {activeResult?.entryPoints?.[0] || infomap.entry.defaultLabel}
               </span>
             </button>
             <div className="absolute top-full left-1/2 h-10 w-[1px] bg-border/80 -translate-x-1/2" />
@@ -129,14 +240,16 @@ export function ArchitectureTab() {
                     ? "border-primary bg-primary/10 shadow-[0_0_20px_-3px_rgba(var(--ring),0.25)] ring-1 ring-primary"
                     : "border-border/60 bg-card hover:border-primary/40 hover:bg-muted/30"
                 }`}
-                aria-label="Application Router routing structure"
+                aria-label={`${infomap.routing.label} details`}
               >
                 <Layers
                   className={`h-4 w-4 mx-auto mb-1.5 ${activeNode === "routing" ? "text-primary" : "text-muted-foreground"}`}
                 />
-                <span className="block text-xs font-semibold font-mono">App Routing</span>
+                <span className="block text-xs font-semibold font-mono">
+                  {infomap.routing.label}
+                </span>
                 <span className="block text-[9px] text-muted-foreground font-mono">
-                  src/router.tsx
+                  {infomap.routing.defaultLabel}
                 </span>
               </button>
 
@@ -147,14 +260,16 @@ export function ArchitectureTab() {
                     ? "border-primary bg-primary/10 shadow-[0_0_20px_-3px_rgba(var(--ring),0.25)] ring-1 ring-primary"
                     : "border-border/60 bg-card hover:border-primary/40 hover:bg-muted/30"
                 }`}
-                aria-label="Layout Shell view layers details"
+                aria-label={`${infomap.layout.label} details`}
               >
                 <Layers
                   className={`h-4 w-4 mx-auto mb-1.5 ${activeNode === "layout" ? "text-primary" : "text-muted-foreground"}`}
                 />
-                <span className="block text-xs font-semibold font-mono">Layout Shell</span>
+                <span className="block text-xs font-semibold font-mono">
+                  {infomap.layout.label}
+                </span>
                 <span className="block text-[9px] text-muted-foreground font-mono">
-                  src/routes/__root
+                  {infomap.layout.defaultLabel}
                 </span>
               </button>
             </div>
@@ -170,8 +285,7 @@ export function ArchitectureTab() {
 
             <div className="grid grid-cols-3 gap-3 w-full">
               {["components", "hooks", "lib"].map((node) => {
-                const label =
-                  node === "lib" ? "Lib / Utils" : node === "hooks" ? "Custom Hooks" : "Components";
+                const item = infomap[node];
                 return (
                   <button
                     key={node}
@@ -181,13 +295,13 @@ export function ArchitectureTab() {
                         ? "border-primary bg-primary/10 shadow-[0_0_15px_-3px_rgba(var(--ring),0.25)] ring-1 ring-primary"
                         : "border-border/60 bg-card hover:border-primary/40 hover:bg-muted/30"
                     }`}
-                    aria-label={`Show details for ${label}`}
+                    aria-label={`Show details for ${item.label}`}
                   >
                     <Folder
                       className={`h-4 w-4 mx-auto mb-1 ${activeNode === node ? "text-primary" : "text-muted-foreground"}`}
                     />
                     <span className="block text-[10px] font-semibold font-mono truncate">
-                      {label}
+                      {item.label}
                     </span>
                   </button>
                 );

@@ -17,6 +17,11 @@ export interface RequestOptions extends RequestInit {
   retryDelay?: number;
 }
 
+export const BACKEND_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(
+  /\/+$/,
+  "",
+);
+
 const DEFAULT_RETRIES = 2;
 const DEFAULT_DELAY = 1000;
 
@@ -26,7 +31,8 @@ async function sleep(ms: number) {
 
 export async function apiFetch<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { retries = DEFAULT_RETRIES, retryDelay = DEFAULT_DELAY, ...init } = options;
-  const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url = `${BACKEND_URL}${formattedEndpoint}`;
 
   // Retrieve user settings dynamically for keys
   const settings = storageService.getSettings();
@@ -46,15 +52,34 @@ export async function apiFetch<T>(endpoint: string, options: RequestOptions = {}
   };
 
   let attempt = 0;
+  let didRefresh = false;
+
   while (attempt <= retries) {
     try {
       const response = await fetch(url, {
+        credentials: "include", // Essential for HttpOnly cookies (access_token)
         ...init,
         headers,
         body: init.method && init.method !== "GET" ? JSON.stringify(mergedBody) : undefined,
       });
 
       if (!response.ok) {
+        // Special case: Silent Token Refresh interceptor
+        if (response.status === 401 && !didRefresh && !endpoint.includes("/auth/")) {
+          try {
+            const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh`, {
+              method: "POST",
+              credentials: "include",
+            });
+            if (refreshRes.ok) {
+              didRefresh = true;
+              continue; // Retry the original request implicitly
+            }
+          } catch (e) {
+            // Refresh network failure, fall through to default error
+          }
+        }
+
         let errMsg = `HTTP Error ${response.status}`;
         let details: any = null;
         try {

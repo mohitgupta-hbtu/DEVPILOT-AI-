@@ -82,15 +82,27 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/api/")) {
-      ensureFastApiRunning();
-      const targetUrl = `http://127.0.0.1:8000${url.pathname}${url.search}`;
+      const backendUrl = (process.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
+      const isRemote = !backendUrl.includes("127.0.0.1") && !backendUrl.includes("localhost");
+
+      if (!isRemote) {
+        ensureFastApiRunning();
+      }
+
+      const targetUrl = `${backendUrl}${url.pathname}${url.search}`;
       console.log(`[Proxy] Routing ${request.method} ${url.pathname} to ${targetUrl}`);
 
       const headers = new Headers();
       request.headers.forEach((value, key) => {
         headers.set(key, value);
       });
-      headers.set("host", "127.0.0.1:8000");
+
+      try {
+        const parsedTarget = new URL(backendUrl);
+        headers.set("host", parsedTarget.host);
+      } catch (err) {
+        headers.set("host", "127.0.0.1:8000");
+      }
 
       let body: string | undefined = undefined;
       if (request.method !== "GET" && request.method !== "HEAD") {
@@ -100,7 +112,8 @@ export default {
       try {
         let attempts = 0;
         let response: Response | null = null;
-        while (attempts < 6) {
+        const maxAttempts = isRemote ? 1 : 6;
+        while (attempts < maxAttempts) {
           try {
             response = await fetch(targetUrl, {
               method: request.method,
@@ -110,8 +123,14 @@ export default {
             break;
           } catch (fetchErr) {
             attempts++;
-            console.log(`[Proxy] FastAPI not ready yet, retrying in 1s (attempt ${attempts}/6)...`);
-            await new Promise((r) => setTimeout(r, 1000));
+            if (!isRemote) {
+              console.log(
+                `[Proxy] FastAPI not ready yet, retrying in 1s (attempt ${attempts}/6)...`,
+              );
+              await new Promise((r) => setTimeout(r, 1000));
+            } else {
+              console.error(`[Proxy] Connection failed to remote backend:`, fetchErr);
+            }
           }
         }
 

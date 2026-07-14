@@ -22,3 +22,10 @@ dist/
 backend/*.db
 backend/*.sqlite3
 backend/*.db-journal
+
+# Local / Temp Files
+compile_errors.txt
+tsc_check.txt
+.wrangler/
+.pytest_cache/
+.tanstack/
