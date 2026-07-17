@@ -25,6 +25,8 @@ interface InteractiveHealthProps {
   overallHealthScore?: number;
   onNavigateToFile?: (filePath: string) => void;
   repoLanguages?: LanguageDistribution[];
+  overallHealth?: Record<string, string>;
+  metricsDetails?: Record<string, string>;
 }
 
 export function InteractiveHealth({
@@ -36,6 +38,8 @@ export function InteractiveHealth({
   overallHealthScore,
   onNavigateToFile,
   repoLanguages,
+  overallHealth,
+  metricsDetails,
 }: InteractiveHealthProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>("documentation");
   const [expandedRecId, setExpandedRecId] = useState<string | null>(null);
@@ -246,6 +250,63 @@ export function InteractiveHealth({
 
   return (
     <div className="space-y-6">
+      {/* STATIC CODEBASE ANALYTICS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+        <div className="bg-background/40 border border-border/50 rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
+              Primary Stack
+            </p>
+            <p className="text-xl font-extrabold mt-1 font-mono">
+              {repoLanguages && repoLanguages.length > 0 ? repoLanguages[0].name : "Mixed"}
+            </p>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <FileCode className="h-5 w-5 text-primary" />
+          </div>
+        </div>
+
+        <div className="bg-background/40 border border-border/50 rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
+              Global Status
+            </p>
+            <p className="text-xl font-extrabold mt-1 font-mono">
+              {overallScore !== undefined
+                ? overallScore > 80
+                  ? "Healthy"
+                  : overallScore > 65
+                    ? "Stable"
+                    : "Critical"
+                : "N/A"}
+            </p>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+            <ShieldCheck className="h-5 w-5 text-emerald-500" />
+          </div>
+        </div>
+
+        <div className="bg-background/40 border border-border/50 rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
+              Tech Debt Check
+            </p>
+            <p className="text-xl font-extrabold mt-1 font-mono">
+              {overallScore !== undefined
+                ? overallScore > 80
+                  ? "Minimal"
+                  : overallScore > 65
+                    ? "Manageable"
+                    : "Extensive"
+                : "Resolving"}
+            </p>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-amber-500/10 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-amber-500" />
+          </div>
+        </div>
+      </div>
+
       {/* 1. HEALTH SUMMARY SCOREBOARD (Bento Grid) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Metric Circular Dial */}
@@ -291,10 +352,10 @@ export function InteractiveHealth({
           <div className="space-y-1">
             <h4 className="text-sm font-extrabold text-foreground flex items-center justify-center gap-1.5">
               <ShieldCheck className="h-4 w-4 text-primary" />
-              <span>{currentGradeInfo.label}</span>
+              <span>{overallHealth?.scoreLabel || currentGradeInfo.label}</span>
             </h4>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
-              {currentGradeInfo.desc}
+              {overallHealth?.summary || currentGradeInfo.desc}
             </p>
           </div>
         </div>
@@ -310,7 +371,9 @@ export function InteractiveHealth({
               <div className="flex items-center gap-2">
                 <Heart className="h-4 w-4 text-rose-500 fill-rose-500/20" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono">
-                  Software Quality Audit
+                  {overallHealth?.auditOverview
+                    ? "Advanced Diagnostic Audit"
+                    : "Software Quality Audit"}
                 </h4>
               </div>
               <span
@@ -322,9 +385,8 @@ export function InteractiveHealth({
 
             <h3 className="text-base font-bold text-foreground">Codebase Diagnostics & Metrics</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              This score indicates the structural health of the repository. DevPilot AI parses tree
-              structures, file sizes, nested layout boundaries, compiler setups, and test suite
-              indicators to formulate standard quality recommendations.
+              {overallHealth?.auditOverview ||
+                "This score indicates the structural health of the repository. DevPilot AI parses tree structures, file sizes, nested layout boundaries, compiler setups, and test suite indicators to formulate standard quality recommendations."}
             </p>
 
             <div className="flex flex-col gap-2 rounded-lg bg-background/50 border border-border/80 p-3.5 mt-2">
@@ -332,7 +394,8 @@ export function InteractiveHealth({
                 Primary Diagnostics Log
               </span>
               <p className="text-xs text-foreground/90 leading-relaxed italic">
-                {explanations.codeQuality ||
+                {overallHealth?.primaryDiagnostic ||
+                  explanations.codeQuality ||
                   "Auditing folder structure. Linters and typescript rules are being enforced dynamically."}
               </p>
             </div>

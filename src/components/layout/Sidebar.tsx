@@ -66,7 +66,7 @@ export function Sidebar({ onCloseMobile, className = "" }: SidebarProps) {
           </span>
           <div className="flex flex-col text-left">
             <span className="text-sm font-bold leading-none">DevPilot AI</span>
-            <span className="text-[10px] text-primary mt-0.5 font-mono">v2.1.0-beta</span>
+            <span className="text-[10px] text-primary mt-0.5 font-mono">v1.0</span>
           </div>
         </Link>
       </div>

@@ -24,10 +24,10 @@ export function LoadingState() {
   if (!isScanning) return null;
 
   // Derive stage index dynamically based on scan progress percentage
-  const currentStageIndex = Math.min(
-    Math.floor((scanProgress / 100) * STAGES.length),
-    STAGES.length - 1,
-  );
+  const currentStageIndex =
+    scanProgress === 100
+      ? STAGES.length
+      : Math.min(Math.floor((scanProgress / 100) * STAGES.length), STAGES.length - 1);
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 pt-6">

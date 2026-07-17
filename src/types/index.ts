@@ -21,7 +21,13 @@ export interface GoodFirstIssue {
   title: string;
   number: number;
   labels: string[];
-  difficulty: "Easy" | "Medium" | "Hard";
+  difficulty: "Easy" | "Medium" | "Hard" | string;
+  reason?: string;
+  relatedFiles?: string[];
+  implementationGuide?: {
+    summary?: string;
+    steps?: string[];
+  };
 }
 
 export interface Dependency {
@@ -69,15 +75,26 @@ export interface RepositoryAnalysis {
   forks: number;
   languages: LanguageDistribution[];
   techStack: string[];
+  techStackDetails?: Record<string, string>[];
+  learningComplexity?: Record<string, string>;
+  metadataAnalysis?: Record<string, string>;
   healthScore: number;
   healthMetrics: HealthMetrics;
   healthRecommendations?: HealthRecommendation[];
   healthExplanations?: HealthExpl;
+  overallHealth?: Record<string, string>;
+  metricsDetails?: Record<string, string>;
   entryPoints: string[];
   suggestedStartingFolders: string[];
   roadmap: RoadmapItem[];
+  journey?: Record<string, string | number>;
+  developerTier?: Record<string, string>;
+  terminalCommands?: Record<string, string>[];
   goodFirstIssues: GoodFirstIssue[];
+  projectContributionGuide?: Record<string, string | string[]>;
+  localSetup?: Record<string, string | Record<string, string>[]>;
   dependencies: Dependency[];
+  architectureNotes?: Record<string, string>[];
   folderStructure: FolderNode;
   scannedAt: string;
 }

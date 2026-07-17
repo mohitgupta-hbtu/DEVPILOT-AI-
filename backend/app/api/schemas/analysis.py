@@ -22,6 +22,8 @@ class HealthMetrics(BaseModel):
 
 class HealthResponse(BaseModel):
     healthScore: int
+    overallHealth: Optional[Dict[str, Any]] = None
+    metricsDetails: Optional[Dict[str, Any]] = None
     metrics: HealthMetrics
     recommendations: Optional[List[Dict[str, Any]]] = None
     explanations: Optional[Dict[str, str]] = None
@@ -41,6 +43,9 @@ class GoodFirstIssueItem(BaseModel):
     number: int
     labels: List[str]
     difficulty: str
+    reason: Optional[str] = None
+    relatedFiles: Optional[List[str]] = None
+    implementationGuide: Optional[Dict[str, Any]] = None
 
 class FolderNode(BaseModel):
     name: str
@@ -57,5 +62,10 @@ class AnalyzeResponse(BaseModel):
     readme: str
     health: HealthResponse
     roadmap: List[RoadmapItem]
+    journey: Optional[Dict[str, Any]] = None
+    developerTier: Optional[Dict[str, Any]] = None
+    terminalCommands: Optional[List[Dict[str, Any]]] = None
     goodFirstIssues: List[GoodFirstIssueItem]
+    projectContributionGuide: Optional[Dict[str, Any]] = None
+    localSetup: Optional[Dict[str, Any]] = None
     architecture: Dict[str, Any]

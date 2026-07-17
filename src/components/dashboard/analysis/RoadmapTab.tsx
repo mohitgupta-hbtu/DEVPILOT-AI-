@@ -14,6 +14,8 @@ export function RoadmapTab() {
         repoUrl={activeResult.repoUrl}
         repoName={activeResult.name}
         onNavigateToFile={onNavigateToFile}
+        journey={activeResult.journey}
+        developerTier={activeResult.developerTier}
       />
     </div>
   );

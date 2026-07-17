@@ -3,10 +3,13 @@ import httpx
 from fastapi import HTTPException
 from .base import BaseAIProvider
 
+# Global tracker for round-robin balancing
+_CURRENT_KEY_INDEX = 0
+
 class GeminiProvider(BaseAIProvider):
     """
     Implementation of BaseAIProvider using the Google Gemini API.
-    Uses 'gemini-3.5-flash' for basic and structured text generation tasks.
+    Uses 'gemini-2.0-flash' for basic and structured text generation tasks.
     """
     
     def __init__(self):
@@ -14,19 +17,29 @@ class GeminiProvider(BaseAIProvider):
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
         
     async def generate(self, prompt: str, system_instruction: str = None, api_key: str = None) -> str:
+        global _CURRENT_KEY_INDEX
+        
         # Load keys either from user input or server environment
         if api_key:
             keys_to_try = [api_key]
         else:
             env_keys_str = os.environ.get("GEMINI_API_KEY", "")
-            # Support comma-separated keys for load balancing / rate limit bypass
-            keys_to_try = [k.strip() for k in env_keys_str.split(",") if k.strip()]
+            all_keys = [k.strip() for k in env_keys_str.split(",") if k.strip()]
             
-        if not keys_to_try:
-            raise HTTPException(
-                status_code=400,
-                detail="Gemini API Key is not set. Please set it in Settings > API Keys or set server GEMINI_API_KEY."
-            )
+            if not all_keys:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Gemini API Key is not set. Please set it in Settings > API Keys or set server GEMINI_API_KEY."
+                )
+                
+            # Distribute concurrent requests across different keys instantly by incrementing index immediately
+            start_idx = _CURRENT_KEY_INDEX
+            _CURRENT_KEY_INDEX = (_CURRENT_KEY_INDEX + 1) % len(all_keys)
+            
+            keys_to_try = []
+            for i in range(len(all_keys)):
+                idx = (start_idx + i) % len(all_keys)
+                keys_to_try.append(all_keys[idx])
             
         headers = {
             "Content-Type": "application/json",
@@ -69,7 +82,9 @@ class GeminiProvider(BaseAIProvider):
                     response = await client.post(url, headers=headers, json=payload)
                     
                     if response.status_code == 429 and attempt < len(keys_to_try) - 1:
-                        # Rate limit hit, let's rotate to the next key in the loop
+                        # Rate limit hit, let's rotate to the next key in the loop securely
+                        if not api_key:
+                            _CURRENT_KEY_INDEX = (_CURRENT_KEY_INDEX + 1) % len(all_keys)
                         print(f"WARN: Rate limit hit on Key {attempt + 1}. Rotating to next API key...")
                         continue
                         

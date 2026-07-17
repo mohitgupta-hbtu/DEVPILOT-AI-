@@ -20,21 +20,74 @@ export function OverviewTab() {
       aria-labelledby="tab-trigger-summary"
     >
       <div className="md:col-span-2 space-y-6">
-        {/* Tech Stack */}
+        {/* Core AI Objective Block (If present) */}
+        {activeResult.metadataAnalysis && (
+          <DashboardCard className="text-left border-primary/20 bg-primary/[0.02]">
+            <h3 className="text-sm font-semibold tracking-tight text-primary mb-3">
+              Repository Core Objective
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground font-mono block mb-1">
+                  Purpose
+                </span>
+                <p className="text-xs text-foreground/90 leading-relaxed">
+                  {activeResult.metadataAnalysis.purpose || "No specific purpose parsed."}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/50">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground font-mono block mb-1">
+                    Primary Audience
+                  </span>
+                  <p className="text-xs text-foreground/80 leading-relaxed font-medium">
+                    {activeResult.metadataAnalysis.audience || "General developers"}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground font-mono block mb-1">
+                    Learning Complexity
+                  </span>
+                  <p className="text-xs text-foreground/80 leading-relaxed font-medium">
+                    {activeResult.learningComplexity?.level || "Beginner"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </DashboardCard>
+        )}
+
+        {/* Tech Stack with AI Categorizations */}
         <DashboardCard className="text-left">
           <h3 className="text-sm font-semibold tracking-tight text-foreground mb-4">
             Core Technology Stack
           </h3>
           <div className="flex flex-wrap gap-2.5">
-            {activeResult.techStack.map((tech) => (
-              <span
-                key={tech}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-xs text-foreground font-mono"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                {tech}
-              </span>
-            ))}
+            {activeResult.techStackDetails && activeResult.techStackDetails.length > 0
+              ? activeResult.techStackDetails.map((tech) => (
+                  <span
+                    key={tech.name}
+                    className="inline-flex flex-col rounded-lg border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs text-foreground"
+                    title={tech.category}
+                  >
+                    <span className="font-mono font-bold flex items-center gap-1.5">
+                      <span className="h-1 w-1 rounded-full bg-primary" />
+                      {tech.name}
+                    </span>
+                    <span className="text-[9px] text-muted-foreground opacity-80 uppercase tracking-widest pl-2.5 mt-0.5">
+                      {tech.category}
+                    </span>
+                  </span>
+                ))
+              : activeResult.techStack.map((tech) => (
+                  <span
+                    key={tech}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-xs text-foreground font-mono"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    {tech}
+                  </span>
+                ))}
           </div>
         </DashboardCard>
 

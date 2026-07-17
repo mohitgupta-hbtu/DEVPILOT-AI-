@@ -29,7 +29,7 @@ export function HowItWorks() {
           <p className="text-base sm:text-lg font-semibold tracking-wider text-primary uppercase">
             How it works
           </p>
-          <h2 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-foreground leading-[1.1]">
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl text-foreground leading-[1.1]">
             Four steps from URL to understanding.
           </h2>
         </div>

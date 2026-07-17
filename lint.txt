@@ -1,0 +1,11 @@
+
+> lint
+> eslint .
+
+
+C:\Users\yasho\website\DEVPILOT-AI-\src\components\dashboard\InteractiveContribution.tsx
+  11:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:67  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 2 problems (2 errors, 0 warnings)
+

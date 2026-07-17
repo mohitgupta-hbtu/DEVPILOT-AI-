@@ -5,6 +5,9 @@
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![TailwindCSS](https://img.shields.io/badge/Styling-Tailwind-F59E0B?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Gemini](https://img.shields.io/badge/AI-Google_Gemini-4285F4?style=for-the-badge&logo=google-gemini&logoColor=white)](https://deepmind.google/technologies/gemini/)
+[![Version](https://img.shields.io/badge/Version-v1.0-blueviolet?style=for-the-badge)]()
+
+**🔴 Live Demo:** [DevPilot AI on Vercel](https://devpilot-ai.vercel.app/)
 
 DevPilot AI is a premium, developer-first workspace designed to automate static repository analysis, structure audits, and interactive codebase onboarding. Instead of manual code walkthroughs or blind AI queries, DevPilot recursive-scans repository AST structures, evaluates configuration file health, streams real-time code, and compiles interactive walkthrough roadmaps.
 

@@ -27,6 +27,8 @@ interface InteractiveRoadmapProps {
   repoUrl: string;
   repoName: string;
   onNavigateToFile?: (filePath: string) => void;
+  journey?: Record<string, string | number>;
+  developerTier?: Record<string, string>;
 }
 
 interface QuizQuestion {
@@ -295,6 +297,8 @@ export function InteractiveRoadmap({
   repoUrl,
   repoName,
   onNavigateToFile,
+  journey,
+  developerTier,
 }: InteractiveRoadmapProps) {
   const localStorageKey = `devpilot_roadmap_items_${repoUrl}`;
 
@@ -459,13 +463,13 @@ export function InteractiveRoadmap({
             <div className="flex items-center gap-2">
               <BookOpenCheck className="h-4 w-4 text-primary" />
               <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono">
-                Interactive Learning Mastership
+                {journey?.title || "Interactive Learning Mastership"}
               </h4>
             </div>
             <h3 className="text-lg font-bold text-foreground">{repoName} Onboarding Journey</h3>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-xl">
-              Track your onboarding checkmarks across all core files. Answer dynamic interactive
-              diagnostic questions to verify your engineering comprehension.
+              {journey?.description ||
+                "Track your onboarding checkmarks across all core files. Answer dynamic interactive diagnostic questions to verify your engineering comprehension."}
             </p>
           </div>
 
@@ -496,24 +500,28 @@ export function InteractiveRoadmap({
           </div>
           <div className="space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground font-mono block">
-              Developer Tier
+              Required Developer Tier
             </span>
             <div className="flex items-center gap-2">
               <Flame className="h-5 w-5 text-amber-500 animate-pulse" />
               <h4 className="text-base font-bold text-foreground">
-                {overallProgressPercent === 100
-                  ? "Architect Master"
-                  : overallProgressPercent >= 60
-                    ? "Proficient Integrationist"
-                    : overallProgressPercent >= 20
-                      ? "Active Navigator"
-                      : "Onboarding Novice"}
+                {developerTier?.level
+                  ? `Tier: ${developerTier.level}`
+                  : overallProgressPercent === 100
+                    ? "Architect Master"
+                    : overallProgressPercent >= 60
+                      ? "Proficient Integrationist"
+                      : overallProgressPercent >= 20
+                        ? "Active Navigator"
+                        : "Onboarding Novice"}
               </h4>
             </div>
             <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
-              {overallProgressPercent === 100
-                ? "Incredible job! You have fully verified every architectural item and onboarding task."
-                : `Complete ${Math.max(1, Math.ceil(totalItemsCount * 0.6) - completedItemsCount)} more tasks to reach the next competency tier.`}
+              {developerTier?.reason
+                ? developerTier.reason
+                : overallProgressPercent === 100
+                  ? "Incredible job! You have fully verified every architectural item and onboarding task."
+                  : `Complete ${Math.max(1, Math.ceil(totalItemsCount * 0.6) - completedItemsCount)} more tasks to reach the next competency tier.`}
             </p>
           </div>
 

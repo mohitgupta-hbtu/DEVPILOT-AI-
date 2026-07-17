@@ -8,6 +8,14 @@ interface InteractiveContributionProps {
   repoName: string;
   onNavigateToFile?: (filePath: string) => void;
   repoLanguages?: LanguageDistribution[];
+  projectContributionGuide?: {
+    summary?: string;
+    highlights?: string[];
+  };
+  localSetup?: {
+    prerequisites?: string[];
+    steps?: { step: string; desc: string; cmd: string }[];
+  };
 }
 
 const getSetupCommands = (dominantLang: string) => {
@@ -95,6 +103,8 @@ export function InteractiveContribution({
   repoName,
   onNavigateToFile,
   repoLanguages,
+  projectContributionGuide,
+  localSetup,
 }: InteractiveContributionProps) {
   const [activeIssueId, setActiveIssueId] = useState<string | null>(issues[0]?.id || null);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
@@ -117,7 +127,9 @@ export function InteractiveContribution({
   const isPython =
     dominantLang.toLowerCase() === "python" || dominantLang.toLowerCase() === "jupyter notebook";
 
-  const setupCommands = getSetupCommands(dominantLang);
+  const localSteps = localSetup?.steps as { step: string; desc: string; cmd: string }[] | undefined;
+  const setupCommands: { step: string; desc: string; cmd: string }[] =
+    localSteps && localSteps.length > 0 ? localSteps : getSetupCommands(dominantLang);
 
   return (
     <div className="space-y-6">
@@ -131,33 +143,42 @@ export function InteractiveContribution({
         </div>
 
         <p className="text-xs text-muted-foreground leading-relaxed max-w-4xl">
-          A standardized Contribution Guide decreases onboarding friction by establishing a clear
-          development workflow. It guarantees environment determinism across the engineering team,
-          enforces strict commit semantics, and isolates{" "}
-          <strong className="text-foreground">Good First Issues</strong>
-          to provide new contributors with a robust, stress-free path to making their first pull
-          request.
+          {projectContributionGuide?.summary ||
+            "A standardized Contribution Guide decreases onboarding friction by establishing a clear development workflow. It guarantees environment determinism across the engineering team, enforces strict commit semantics, and isolates Good First Issues to provide new contributors with a robust, stress-free path to making their first pull request."}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 text-[11px] text-muted-foreground">
-          <div className="flex items-start gap-2">
-            <Check className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
-            <span>
-              <strong>Unified Standard:</strong> Eliminates environment-drift issues.
-            </span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
-            <span>
-              <strong>Branch Safety:</strong> Enforces standard lint checks on pipelines.
-            </span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
-            <span>
-              <strong>Community Flow:</strong> Empowers builders with structured workflows.
-            </span>
-          </div>
+          {projectContributionGuide?.highlights &&
+          Array.isArray(projectContributionGuide.highlights) &&
+          projectContributionGuide.highlights.length > 0 ? (
+            projectContributionGuide.highlights.map((highlight: string, idx: number) => (
+              <div key={idx} className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
+                <span>{highlight}</span>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
+                <span>
+                  <strong>Unified Standard:</strong> Eliminates environment-drift issues.
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
+                <span>
+                  <strong>Branch Safety:</strong> Enforces standard lint checks on pipelines.
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
+                <span>
+                  <strong>Community Flow:</strong> Empowers builders with structured workflows.
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -292,10 +313,9 @@ export function InteractiveContribution({
 
               <div className="space-y-4">
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  To securely implement{" "}
-                  <strong className="text-foreground">"{activeIssue.title}"</strong>, we recommend
-                  executing an isolated feature branch and evaluating entry file hooks. Observe
-                  testing specs associated with these boundaries.
+                  {activeIssue.reason ||
+                    activeIssue.implementationGuide?.summary ||
+                    `To securely implement "${activeIssue.title}", we recommend executing an isolated feature branch and evaluating entry file hooks. Observe testing specs associated with these boundaries.`}
                 </p>
 
                 <div className="rounded-lg border border-border/60 bg-card/30 p-3 space-y-2">
@@ -303,17 +323,31 @@ export function InteractiveContribution({
                     Diagnostic Entry Files
                   </span>
                   <div className="flex flex-wrap gap-1.5">
-                    {onNavigateToFile && (
-                      <span
-                        className="rounded bg-background border border-border px-2 py-1 text-[10px] font-mono text-primary cursor-pointer hover:border-primary/80 transition-colors shadow-sm"
-                        onClick={() => onNavigateToFile(isPython ? "main.py" : "src/App.tsx")}
-                      >
-                        {isPython ? "main.py" : "src/App.tsx"}
-                      </span>
+                    {activeIssue.relatedFiles && activeIssue.relatedFiles.length > 0 ? (
+                      activeIssue.relatedFiles.map((file, idx) => (
+                        <span
+                          key={idx}
+                          className="rounded bg-background border border-border px-2 py-1 text-[10px] font-mono text-primary cursor-pointer hover:border-primary/80 transition-colors shadow-sm"
+                          onClick={() => onNavigateToFile && onNavigateToFile(file)}
+                        >
+                          {file}
+                        </span>
+                      ))
+                    ) : (
+                      <>
+                        {onNavigateToFile && (
+                          <span
+                            className="rounded bg-background border border-border px-2 py-1 text-[10px] font-mono text-primary cursor-pointer hover:border-primary/80 transition-colors shadow-sm"
+                            onClick={() => onNavigateToFile(isPython ? "main.py" : "src/App.tsx")}
+                          >
+                            {isPython ? "main.py" : "src/App.tsx"}
+                          </span>
+                        )}
+                        <span className="rounded bg-background border border-border px-2 py-1 text-[10px] font-mono text-muted-foreground cursor-not-allowed">
+                          {isPython ? "requirements.txt" : "package.json"}
+                        </span>
+                      </>
                     )}
-                    <span className="rounded bg-background border border-border px-2 py-1 text-[10px] font-mono text-muted-foreground cursor-not-allowed">
-                      {isPython ? "requirements.txt" : "package.json"}
-                    </span>
                   </div>
                 </div>
 
@@ -322,27 +356,39 @@ export function InteractiveContribution({
                     Actionable Implementation Steps
                   </span>
                   <ul className="space-y-1.5 text-xs">
-                    <li className="flex items-start gap-2 text-muted-foreground">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary/70 mt-1.5 shrink-0" />
-                      <span>
-                        Clone the upstream repository and verify local environment installs run
-                        cleanly.
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2 text-muted-foreground">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary/70 mt-1.5 shrink-0" />
-                      <span>
-                        Trace execution path to isolate variables associated with this component
-                        anomaly.
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2 text-muted-foreground">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary/70 mt-1.5 shrink-0" />
-                      <span>
-                        Utilize local unit testing suites before opening a formal pull request
-                        upstream.
-                      </span>
-                    </li>
+                    {activeIssue.implementationGuide?.steps &&
+                    activeIssue.implementationGuide.steps.length > 0 ? (
+                      activeIssue.implementationGuide.steps.map((step, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-muted-foreground">
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/70 mt-1.5 shrink-0" />
+                          <span>{step}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <>
+                        <li className="flex items-start gap-2 text-muted-foreground">
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/70 mt-1.5 shrink-0" />
+                          <span>
+                            Clone the upstream repository and verify local environment installs run
+                            cleanly.
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2 text-muted-foreground">
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/70 mt-1.5 shrink-0" />
+                          <span>
+                            Trace execution path to isolate variables associated with this component
+                            anomaly.
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2 text-muted-foreground">
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/70 mt-1.5 shrink-0" />
+                          <span>
+                            Utilize local unit testing suites before opening a formal pull request
+                            upstream.
+                          </span>
+                        </li>
+                      </>
+                    )}
                   </ul>
                 </div>
               </div>

@@ -1,0 +1,98 @@
+
+> lint
+> eslint .
+
+
+C:\Users\yasho\website\DEVPILOT-AI-\src\components\dashboard\InteractiveContribution.tsx
+   11:30   error  Unexpected any. Specify a different type                                                                                          @typescript-eslint/no-explicit-any
+   12:16   error  Unexpected any. Specify a different type                                                                                          @typescript-eslint/no-explicit-any
+  116:9    error  Insert `┬╖┬╖`                                                                                                                       prettier/prettier
+  117:9    error  Insert `┬╖┬╖`                                                                                                                       prettier/prettier
+  118:1    error  Insert `┬╖┬╖`                                                                                                                       prettier/prettier
+  124:71   error  Replace `┬╖localSetup?.steps?.length┬╖>┬╖0ΓÅÄ┬╖┬╖┬╖┬╖?┬╖localSetup.stepsΓÅÄ┬╖┬╖┬╖` with `ΓÅÄ┬╖┬╖┬╖┬╖localSetup?.steps?.length┬╖>┬╖0┬╖?┬╖localSetup.steps`  prettier/prettier
+  141:352  error  Delete `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                                              prettier/prettier
+  146:51   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                                               prettier/prettier
+  256:97   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                                  prettier/prettier
+  257:1    error  Insert `┬╖┬╖`                                                                                                                       prettier/prettier
+  258:23   error  Insert `┬╖┬╖`                                                                                                                       prettier/prettier
+  259:1    error  Delete `┬╖┬╖`                                                                                                                       prettier/prettier
+  270:101  error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                              prettier/prettier
+  271:1    error  Insert `┬╖┬╖`                                                                                                                       prettier/prettier
+  272:27   error  Insert `┬╖┬╖`                                                                                                                       prettier/prettier
+  273:1    error  Delete `┬╖┬╖`                                                                                                                       prettier/prettier
+  307:41   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                                     prettier/prettier
+  308:207  error  Delete `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                                      prettier/prettier
+  350:63   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                                     prettier/prettier
+
+C:\Users\yasho\website\DEVPILOT-AI-\src\components\dashboard\InteractiveHealth.tsx
+   28:19   error  Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+   29:20   error  Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+   59:11   error  Insert `┬╖┬╖`                                                                                                             prettier/prettier
+   60:11   error  Insert `┬╖┬╖`                                                                                                             prettier/prettier
+   61:1    error  Insert `┬╖┬╖`                                                                                                             prettier/prettier
+  141:1    error  Insert `┬╖┬╖`                                                                                                             prettier/prettier
+  317:48   error  Replace `┬╖?┬╖"Advanced┬╖Diagnostic┬╖Audit"` with `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖?┬╖"Advanced┬╖Diagnostic┬╖Audit"ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`  prettier/prettier
+  338:53   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                             prettier/prettier
+  377:23   error  Insert `┬╖┬╖`                                                                                                             prettier/prettier
+  378:23   error  Insert `┬╖┬╖`                                                                                                             prettier/prettier
+  379:1    error  Insert `┬╖┬╖`                                                                                                             prettier/prettier
+  387:141  error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                          prettier/prettier
+  390:1    error  Delete `┬╖┬╖`                                                                                                             prettier/prettier
+  507:93   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                                            prettier/prettier
+  510:1    error  Delete `┬╖┬╖`                                                                                                             prettier/prettier
+
+C:\Users\yasho\website\DEVPILOT-AI-\src\components\dashboard\InteractiveRoadmap.tsx
+   30:13   error  Unexpected any. Specify a different type                                                                  @typescript-eslint/no-explicit-any
+   31:19   error  Unexpected any. Specify a different type                                                                  @typescript-eslint/no-explicit-any
+  469:63   error  Replace `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{repoName}┬╖Onboarding┬╖JourneyΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖` with `{repoName}┬╖Onboarding┬╖Journey`  prettier/prettier
+  566:147  error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                            prettier/prettier
+  569:1    error  Delete `┬╖┬╖`                                                                                               prettier/prettier
+  598:70   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                        prettier/prettier
+  603:1    error  Delete `┬╖┬╖`                                                                                               prettier/prettier
+  612:72   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                        prettier/prettier
+  613:1    error  Delete `┬╖┬╖`                                                                                               prettier/prettier
+  674:109  error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                        prettier/prettier
+  677:1    error  Delete `┬╖┬╖`                                                                                               prettier/prettier
+  687:80   error  Insert `ΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`                                                                    prettier/prettier
+  690:1    error  Delete `┬╖┬╖`                                                                                               prettier/prettier
+
+C:\Users\yasho\website\DEVPILOT-AI-\src\components\dashboard\analysis\OverviewTab.tsx
+  68:17  error  Insert `┬╖┬╖`                                               prettier/prettier
+  69:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  70:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  71:19  error  Insert `┬╖┬╖`                                               prettier/prettier
+  72:17  error  Insert `┬╖┬╖`                                               prettier/prettier
+  73:1   error  Replace `┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖` with `┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`  prettier/prettier
+  74:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  75:21  error  Insert `┬╖┬╖`                                               prettier/prettier
+  76:1   error  Replace `┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖` with `┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`  prettier/prettier
+  77:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  78:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  79:19  error  Insert `┬╖┬╖`                                               prettier/prettier
+  80:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  81:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  83:17  error  Insert `┬╖┬╖`                                               prettier/prettier
+  84:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  85:1   error  Replace `┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖` with `┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`  prettier/prettier
+  86:17  error  Insert `┬╖┬╖`                                               prettier/prettier
+  87:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  88:19  error  Insert `┬╖┬╖`                                               prettier/prettier
+  89:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+  90:1   error  Insert `┬╖┬╖`                                               prettier/prettier
+
+C:\Users\yasho\website\DEVPILOT-AI-\src\types\index.ts
+  78:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  80:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  85:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  86:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  90:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  91:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  92:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  94:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  95:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  97:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 80 problems (80 errors, 0 warnings)
+  63 errors and 0 warnings potentially fixable with the `--fix` option.
+

@@ -15,6 +15,8 @@ export function ContributionTab() {
         repoName={activeResult.name}
         onNavigateToFile={onNavigateToFile}
         repoLanguages={activeResult.languages}
+        projectContributionGuide={activeResult.projectContributionGuide}
+        localSetup={activeResult.localSetup}
       />
     </div>
   );

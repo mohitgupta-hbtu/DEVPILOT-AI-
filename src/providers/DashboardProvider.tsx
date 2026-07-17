@@ -55,9 +55,12 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     addLog(`CONFIG: Target URL [${repoUrl}]`);
     addLog(`CONFIG: Target Branch [${branch}], Parsing Depth [${depth}]`);
 
+    let progressTally = 5;
+
     // Setup visual mock steps placeholder log helper (so screen updates during http duration)
     const logInterval = setInterval(() => {
-      setScanProgress((prev) => Math.min(prev + 12, 90));
+      progressTally = Math.min(progressTally + 12, 90);
+      setScanProgress(progressTally);
       const logOptions = [
         "FETCH: Reading remote repository hierarchy...",
         "PARSE: Resolving manifest configuration dependencies...",
@@ -77,10 +80,39 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       });
 
       clearInterval(logInterval);
+
+      // Smoothly walk and animate through all remaining stages to show complete checklist progress
+      let currentProgress = progressTally;
+      const nextSteps = [
+        { target: 45, log: "PARSE: Compiling AST dependency graph nodes..." },
+        { target: 65, log: "ANALYSIS: Auditing structural code smells & cognitive complexity..." },
+        {
+          target: 85,
+          log: "HEALTH: Computing compiler rules, rules configuration & linter quality...",
+        },
+        { target: 100, log: "DISPATCH: Linking directory nodes to the workspace UI model..." },
+      ];
+
+      for (const step of nextSteps) {
+        if (currentProgress < step.target) {
+          const diff = step.target - currentProgress;
+          const subSteps = 5;
+          const inc = diff / subSteps;
+          for (let i = 0; i < subSteps; i++) {
+            currentProgress += inc;
+            setScanProgress(Math.round(currentProgress));
+            await new Promise((r) => setTimeout(r, 60));
+          }
+          addLog(step.log);
+          await new Promise((r) => setTimeout(r, 450));
+        }
+      }
+
       setScanProgress(100);
       setCurrentStage(6);
 
       addLog(`HTTP: Payload received successfully. Processing metadata mapping...`);
+      await new Promise((r) => setTimeout(r, 400));
       setIsScanning(false);
 
       storageService.saveScanToHistory(analysis);

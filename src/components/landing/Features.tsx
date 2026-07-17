@@ -38,12 +38,12 @@ export function Features() {
   return (
     <section id="features" className="py-28 relative">
       <div className="mx-auto max-w-[1280px] px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-medium text-primary">Features</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-xl font-semibold tracking-wider text-primary uppercase">Features</p>
+          <h2 className="mt-3.5 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-5xl">
             Everything you need to read a repo like the author.
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-5 text-lg sm:text-xl text-muted-foreground leading-relaxed">
             Six focused views that turn any codebase into something you can navigate, learn from and
             contribute to.
           </p>

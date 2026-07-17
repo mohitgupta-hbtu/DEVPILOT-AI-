@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronRight, Sparkles, History, X } from "lucide-react";
+import { Search, ChevronRight, Sparkles, History, X, Download } from "lucide-react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Navbar } from "@/components/layout/Navbar";
 import { useDashboard } from "@/hooks";
+import { RepositoryAnalysis } from "@/types";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { history, settings } = useDashboard();
+  const { history, settings, activeScan } = useDashboard();
 
   // Listen to Command+K or Control+K to trigger the Search Modal
   useEffect(() => {

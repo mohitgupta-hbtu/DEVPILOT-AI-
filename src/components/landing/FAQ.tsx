@@ -34,7 +34,7 @@ export function FAQ() {
           <p className="text-xl sm:text-2xl font-bold tracking-widest text-primary uppercase">
             FAQ
           </p>
-          <h2 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-foreground leading-[1.1]">
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl text-foreground leading-[1.1]">
             Frequently asked questions
           </h2>
         </div>

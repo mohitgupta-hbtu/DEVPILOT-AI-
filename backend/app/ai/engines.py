@@ -161,13 +161,18 @@ class RepositoryIntelligenceEngine:
             "test_score": health_metrics.get("metrics", {}).get("testing", 80)
         }
         
-        # 6. Dispatch parallel calls
+        # 6. Dispatch parallel calls (staggered slightly to avoid instantaneous IP rate-limit blocks)
+        import random
+        async def staggered_run(delay: float, coro):
+            await asyncio.sleep(delay)
+            return await coro
+
         tasks = [
-            self.get_insight_async("summary", summary_prompt, context, summary_cache_key, api_key=api_key, openrouter_key=openrouter_key),
-            self.get_insight_async("architecture", architecture_prompt, context, architecture_cache_key, api_key=api_key, openrouter_key=openrouter_key),
-            self.get_insight_async("roadmap", roadmap_prompt, context, roadmap_cache_key, api_key=api_key, openrouter_key=openrouter_key),
-            self.get_insight_async("contribution", contribution_prompt, context, contribution_cache_key, api_key=api_key, openrouter_key=openrouter_key),
-            self.get_insight_async("health", health_prompt, context, health_cache_key, health_replacements, api_key=api_key, openrouter_key=openrouter_key)
+            staggered_run(0.0, self.get_insight_async("summary", summary_prompt, context, summary_cache_key, api_key=api_key, openrouter_key=openrouter_key)),
+            staggered_run(0.2, self.get_insight_async("architecture", architecture_prompt, context, architecture_cache_key, api_key=api_key, openrouter_key=openrouter_key)),
+            staggered_run(0.4, self.get_insight_async("roadmap", roadmap_prompt, context, roadmap_cache_key, api_key=api_key, openrouter_key=openrouter_key)),
+            staggered_run(0.6, self.get_insight_async("contribution", contribution_prompt, context, contribution_cache_key, api_key=api_key, openrouter_key=openrouter_key)),
+            staggered_run(0.8, self.get_insight_async("health", health_prompt, context, health_cache_key, health_replacements, api_key=api_key, openrouter_key=openrouter_key))
         ]
         
         # 7. Await concurrently
@@ -181,6 +186,9 @@ class RepositoryIntelligenceEngine:
         
         # 8. Assemble combined payload, merging AI elements with fallback defaults if AI blocks failed
         final_tech_stack = summary_res.get("techStack", static_fallback_data["techStack"])
+        final_tech_stack_details = summary_res.get("techStackDetails", [])
+        learning_complexity = summary_res.get("learningComplexity", {"level": "Beginner", "reason": ""})
+        repository_data = summary_res.get("repository", {"purpose": "", "audience": "", "objective": ""})
         final_entry_points = summary_res.get("entryPoints", static_fallback_data["entryPoints"])
         final_suggested_folders = summary_res.get("suggestedStartingFolders", static_fallback_data["suggestedStartingFolders"])
         
@@ -201,8 +209,15 @@ class RepositoryIntelligenceEngine:
         else:
             final_roadmap = static_fallback_data["roadmap"]
             
+        journey = roadmap_res.get("journey", {"title": "", "description": "", "overallProgress": 0, "totalTasks": 0})
+        developer_tier = roadmap_res.get("developerTier", {"level": "Beginner", "reason": ""})
+        terminal_commands = roadmap_res.get("terminalCommands", [])
+            
         # Good First Issues mapping
         ai_gfi = contrib_res.get("goodFirstIssues", [])
+        project_contribution_guide = contrib_res.get("projectContributionGuide", {"summary": "", "highlights": []})
+        local_setup = contrib_res.get("localSetup", {"steps": []})
+        
         if ai_gfi:
             final_gfi = []
             for idx, g in enumerate(ai_gfi):
@@ -211,13 +226,18 @@ class RepositoryIntelligenceEngine:
                     "title": g.get("title") or "Improve module configurations",
                     "number": g.get("number") or (101 + idx),
                     "labels": g.get("labels") or ["good first issue"],
-                    "difficulty": g.get("difficulty") or "Easy"
+                    "difficulty": g.get("difficulty") or "Easy",
+                    "reason": g.get("reason", ""),
+                    "relatedFiles": g.get("relatedFiles", []),
+                    "implementationGuide": g.get("implementationGuide", {"summary": "", "steps": []})
                 })
         else:
             final_gfi = static_fallback_data["goodFirstIssues"]
             
         # Dependencies mapping
         ai_deps = arch_res.get("dependencies", [])
+        architecture_notes = arch_res.get("architectureNotes", [])
+        
         if ai_deps:
             final_deps = []
             for d in ai_deps:
@@ -230,21 +250,28 @@ class RepositoryIntelligenceEngine:
             final_deps = static_fallback_data["dependencies"]
             
         # Health score commentary enrichment
-        # We preserve the rule-based quantitative scores but add qualitative explanations if available
         doc_expl = health_res.get("documentationExplanation", "Documentation score matches structure density.")
         cq_expl = health_res.get("codeQualityExplanation", "Linter patterns and tsconfig configurations are fully satisfied.")
         maint_expl = health_res.get("maintainabilityExplanation", "Folders split correctly according to scope standards.")
         comp_expl = health_res.get("complexityExplanation", "Cognitive complexity and directory nesting are balanced.")
         test_expl = health_res.get("testingExplanation", "Testing framework setup aligns with source tests configurations.")
         
-        # We can enrich the descriptions or titles of health features
+        overall_health = health_res.get("overallHealth", {"scoreLabel": "", "summary": "", "auditOverview": "", "primaryDiagnostic": ""})
+        metrics_details = health_res.get("metrics", {})
+        
         return {
             "techStack": final_tech_stack,
+            "techStackDetails": final_tech_stack_details,
+            "learningComplexity": learning_complexity,
+            "metadataAnalysis": repository_data,
             "entryPoints": final_entry_points,
             "suggestedStartingFolders": final_suggested_folders,
             "dependencies": final_deps,
+            "architectureNotes": architecture_notes,
             "health": {
                 "healthScore": health_metrics.get("healthScore", 80),
+                "overallHealth": overall_health,
+                "metricsDetails": metrics_details,
                 "metrics": health_metrics.get("metrics", {
                     "documentation": 80,
                     "codeQuality": 80,
@@ -252,7 +279,7 @@ class RepositoryIntelligenceEngine:
                     "complexity": 80,
                     "testing": 80
                 }),
-                "recommendations": health_metrics.get("recommendations", []),
+                "recommendations": health_res.get("recommendations", []) or health_metrics.get("recommendations", []),
                 "explanations": {
                     "documentation": doc_expl,
                     "codeQuality": cq_expl,
@@ -262,7 +289,12 @@ class RepositoryIntelligenceEngine:
                 }
             },
             "roadmap": final_roadmap,
-            "goodFirstIssues": final_gfi
+            "journey": journey,
+            "developerTier": developer_tier,
+            "terminalCommands": terminal_commands,
+            "goodFirstIssues": final_gfi,
+            "projectContributionGuide": project_contribution_guide,
+            "localSetup": local_setup
         }
 
 # Singleton instance

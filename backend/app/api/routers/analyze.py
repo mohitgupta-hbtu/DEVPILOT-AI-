@@ -82,6 +82,9 @@ async def analyze_repository(request: AnalyzeRequest):
             "stars": repo_info.get("stargazers_count", 0),
             "forks": repo_info.get("forks_count", 0),
             "techStack": analysis["techStack"],
+            "techStackDetails": analysis.get("techStackDetails", []),
+            "metadataAnalysis": analysis.get("metadataAnalysis", {}),
+            "learningComplexity": analysis.get("learningComplexity", {}),
             "entryPoints": analysis["entryPoints"],
             "suggestedStartingFolders": analysis["suggestedStartingFolders"]
         },
@@ -107,15 +110,25 @@ async def analyze_repository(request: AnalyzeRequest):
         "readme": readme_text,
         "health": {
             "healthScore": analysis["health"]["healthScore"],
-            "metrics": analysis["health"]["metrics"]
+            "overallHealth": analysis["health"].get("overallHealth", {}),
+            "metricsDetails": analysis["health"].get("metricsDetails", {}),
+            "metrics": analysis["health"]["metrics"],
+            "recommendations": analysis["health"].get("recommendations", []),
+            "explanations": analysis["health"].get("explanations", {})
         },
         "roadmap": analysis["roadmap"],
+        "journey": analysis.get("journey", {}),
+        "developerTier": analysis.get("developerTier", {}),
+        "terminalCommands": analysis.get("terminalCommands", []),
         "goodFirstIssues": analysis["goodFirstIssues"],
+        "projectContributionGuide": analysis.get("projectContributionGuide", {}),
+        "localSetup": analysis.get("localSetup", {}),
         "architecture": {
             "folderStructure": folder_structure,
             "entryPoints": analysis["entryPoints"],
             "suggestedStartingFolders": analysis["suggestedStartingFolders"],
-            "dependencies": analysis["dependencies"]
+            "dependencies": analysis["dependencies"],
+            "architectureNotes": analysis.get("architectureNotes", [])
         }
     }
 

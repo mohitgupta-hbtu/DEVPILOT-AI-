@@ -25,20 +25,19 @@ class RepositoryContextBuilder:
         ]
         
         # 2. Folder structure / File list (compressed)
-        # Sort paths to keep them logical, limit to 120 key files to keep context token-friendly
+        # Sort paths to keep them logical, limit to 60 key files to keep context token-friendly
         paths = sorted([node["path"] for node in flat_tree if node["type"] == "blob"])
-        if len(paths) > 120:
-            # Prioritize source/config/documentation files, exclude common binary or lock files
-            filtered_paths = [
-                p for p in paths 
-                if not any(exclude in p.lower() for exclude in ["node_modules", ".git", "package-lock", "yarn.lock", "pnpm-lock", ".png", ".jpg", ".jpeg", ".gif", ".ico"])
-            ]
-            if len(filtered_paths) > 120:
-                paths_summary = filtered_paths[:110] + [f"... and {len(filtered_paths) - 110} more files."]
-            else:
-                paths_summary = filtered_paths
+        
+        # Prioritize source/config/documentation files, exclude common binary, UI, or lock files
+        exclusions = ["node_modules", ".git", "package-lock", "yarn.lock", "pnpm-lock", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".eot", ".woff", ".woff2", ".ttf", ".mp4", ".mov", ".wav", ".mp3", "dist/", "build/", "out/", ".next/"]
+        
+        filtered_paths = [p for p in paths if not any(exclude in p.lower() for exclude in exclusions)]
+        
+        if len(filtered_paths) > 60:
+            # Intelligent slice: take the first 45 (usually structure/root files) and last 15, skipping middle bloat
+            paths_summary = filtered_paths[:45] + ["... [middle files skipped for context length] ..."] + filtered_paths[-15:]
         else:
-            paths_summary = paths
+            paths_summary = filtered_paths
             
         tree_section = "\n".join(f"- {p}" for p in paths_summary)
         

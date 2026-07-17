@@ -18,6 +18,8 @@ export function HealthTab() {
         overallHealthScore={activeResult.healthScore}
         onNavigateToFile={onNavigateToFile}
         repoLanguages={activeResult.languages}
+        overallHealth={activeResult.overallHealth}
+        metricsDetails={activeResult.metricsDetails}
       />
     </div>
   );
