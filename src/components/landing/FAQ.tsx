@@ -61,7 +61,7 @@ export function FAQ() {
                   "relative px-5 py-3 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer border",
                   isActive
                     ? "bg-primary/10 border-primary text-foreground shadow-lg shadow-primary/15 font-semibold"
-                    : "bg-card/40 border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-muted/20"
+                    : "bg-card/40 border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-muted/20",
                 )}
               >
                 <span>{f.q}</span>
@@ -98,7 +98,9 @@ export function FAQ() {
 
               <div className="flex items-center gap-2.5 text-primary text-xs font-mono font-semibold uppercase tracking-wider">
                 <HelpCircle className="w-4 h-4" />
-                <span>Question {activeTab + 1} of {faqs.length}</span>
+                <span>
+                  Question {activeTab + 1} of {faqs.length}
+                </span>
               </div>
 
               <h3 className="text-xl sm:text-2xl font-bold text-foreground font-sans tracking-tight">
