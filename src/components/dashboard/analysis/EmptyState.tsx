@@ -18,8 +18,8 @@ export function EmptyState() {
   const [repoUrl, setRepoUrl] = useState("");
 
   // Dynamically count scans to trigger API advice block
-  const scanCount = Number(localStorage.getItem("devpilot_scan_count") || "0");
-  const isLimitReached = scanCount >= 2 && !localStorage.getItem("sandbox_settings");
+  const scanCount = typeof window !== "undefined" ? Number(localStorage.getItem("devpilot_scan_count") || "0") : 0;
+  const isLimitReached = typeof window !== "undefined" ? (scanCount >= 2 && !localStorage.getItem("sandbox_settings")) : false;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
