@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { HelpCircle, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const faqs = [
@@ -26,49 +27,89 @@ const faqs = [
 ];
 
 export function FAQ() {
-  const [open, setOpen] = useState<number | null>(0);
+  const [activeTab, setActiveTab] = useState<number>(0);
+
   return (
-    <section id="faq" className="py-28">
-      <div className="mx-auto max-w-4xl px-6">
-        <div className="text-center">
-          <p className="text-xl sm:text-2xl font-bold tracking-widest text-primary uppercase">
+    <section id="faq" className="py-28 bg-background relative overflow-hidden">
+      {/* Background ambient lighting */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-primary/10 blur-[120px] pointer-events-none rounded-full" />
+
+      <div className="mx-auto max-w-5xl px-6 relative z-10 space-y-12">
+        {/* Header */}
+        <div className="text-center space-y-4 max-w-2xl mx-auto">
+          <p className="text-xl sm:text-2xl font-bold tracking-widest text-primary uppercase font-mono">
             FAQ
           </p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl text-foreground leading-[1.1]">
-            Frequently asked questions
+
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.15] font-sans">
+            Frequently Asked Questions
           </h2>
+          <p className="text-base sm:text-lg text-muted-foreground font-normal">
+            The most common questions we get asked about DevPilot AI.
+          </p>
         </div>
-        <div className="mt-12 divide-y divide-border rounded-2xl border border-border bg-background/50">
+
+        {/* Kokonut UI Style Floating Question Pills */}
+        <div className="flex flex-wrap justify-center gap-2.5 sm:gap-3 max-w-4xl mx-auto pt-2">
           {faqs.map((f, i) => {
-            const isOpen = open === i;
+            const isActive = activeTab === i;
             return (
-              <div key={f.q}>
-                <button
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between gap-6 px-6 py-6 text-left hover:bg-muted/10 transition-colors duration-200"
-                  aria-expanded={isOpen}
-                >
-                  <span className="text-base font-semibold sm:text-lg transition-colors group-hover:text-primary">
-                    {f.q}
-                  </span>
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200",
-                      isOpen && "rotate-180 text-primary",
-                    )}
+              <button
+                key={f.q}
+                onClick={() => setActiveTab(i)}
+                className={cn(
+                  "relative px-5 py-3 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer border",
+                  isActive
+                    ? "bg-primary/10 border-primary text-foreground shadow-lg shadow-primary/15 font-semibold"
+                    : "bg-card/40 border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-muted/20"
+                )}
+              >
+                <span>{f.q}</span>
+
+                {/* Bottom Active Glow Accent Bar */}
+                {isActive && (
+                  <motion.div
+                    layoutId="faq-active-bar"
+                    className="absolute bottom-0 left-3 right-3 h-[2.5px] bg-primary rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.8)]"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
-                </button>
-                <div
-                  className={cn(
-                    "grid overflow-hidden px-6 text-base text-muted-foreground transition-all duration-300 ease-in-out",
-                    isOpen ? "grid-rows-[1fr] pb-6" : "grid-rows-[0fr]",
-                  )}
-                >
-                  <div className="min-h-0 leading-relaxed">{f.a}</div>
-                </div>
-              </div>
+                )}
+              </button>
             );
           })}
+        </div>
+
+        {/* Divider */}
+        <div className="w-full border-t border-border/40 my-6" />
+
+        {/* Active Answer Display Area */}
+        <div className="max-w-3xl mx-auto min-h-[140px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 12, scale: 0.99 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.99 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="p-8 rounded-2xl border border-primary/20 bg-gradient-to-b from-card/80 to-background/90 backdrop-blur-xl shadow-2xl space-y-3 relative overflow-hidden group"
+            >
+              {/* Subtle top corner ambient accent */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-2.5 text-primary text-xs font-mono font-semibold uppercase tracking-wider">
+                <HelpCircle className="w-4 h-4" />
+                <span>Question {activeTab + 1} of {faqs.length}</span>
+              </div>
+
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground font-sans tracking-tight">
+                {faqs[activeTab].q}
+              </h3>
+
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed pt-1 font-sans font-normal">
+                {faqs[activeTab].a}
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>
